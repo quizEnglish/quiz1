@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الاختبارات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#2b1b7a;--bg2:#7a2fc0;--card:rgba(255,255,255,.14);--tx:#fff;--ac:#ffd23f;--ot:#1d1650;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg1:#ece6ff;--bg2:#ffdcee;--card:rgba(255,255,255,.75);--tx:#1d1650;--ac:#c2410c;color-scheme:light}}
+:root[data-theme="light"]{--bg1:#ece6ff;--bg2:#ffdcee;--card:rgba(255,255,255,.75);--tx:#1d1650;--ac:#c2410c;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:'Tajawal',Tahoma,sans-serif;color:var(--tx);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;padding-block:28px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px;text-align:center}
+h1{margin:0;font-size:38px;font-weight:900;line-height:1.2}
+p{margin:0;font-size:19px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+.q{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:84px;padding:12px;border-radius:20px;background:var(--card);color:var(--tx);text-decoration:none;font-weight:900;font-size:22px;box-shadow:0 5px 0 rgba(0,0,0,.2);transition:transform .15s}
+.q small{font-size:14px;font-weight:400;opacity:.8}
+.q:hover,.q:focus-visible{transform:translateY(-3px);outline:2px solid var(--ac)}
+.q:active{transform:scale(.96)}
+@media(prefers-reduced-motion:reduce){.q{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>الاختبارات 🎯</h1>
+<p>اختر الاختبار اللي تبغى تبدأ فيه</p>
+<nav class="grid" id="list" aria-label="قائمة الاختبارات"></nav>
+</main>
+<script>
+// عدّل القائمة هنا: الاسم الظاهر، واسم الملف كما هو في المستودع
+const QUIZZES=Array.from({length:20},(_,i)=>{const n=String(i+1).padStart(2,'0');return{title:'اختبار '+(i+1),file:'Quiz-'+n+'.html'}});
+const box=document.getElementById('list');
+QUIZZES.forEach(q=>{const a=document.createElement('a');a.className='q';a.href=encodeURI(q.file);a.innerHTML='<span></span><small></small>';a.firstChild.textContent=q.title;a.lastChild.textContent='ابدأ ◀';box.appendChild(a)});
+</script>
+</body>
+</html>
