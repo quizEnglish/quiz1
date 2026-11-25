@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختبار النفايات القابلة لإعادة التدوير</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: single centered column, one question per screen, progress on top. */
+:root {
+  --bg: #f3f7f6;
+  --surface: #ffffff;
+  --ink: #12302c;
+  --muted: #5b726e;
+  --line: #d5e2df;
+  --accent: #0b6b5e;
+  --accent-ink: #ffffff;
+  --good: #14733a;
+  --good-bg: #e3f4e9;
+  --bad: #b4261f;
+  --bad-bg: #fbe7e5;
+  --font: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1c1a; --surface: #152825; --ink: #e6f1ef; --muted: #9bb3af;
+    --line: #28423e; --accent: #4fc3ae; --accent-ink: #06201b;
+    --good: #6ddc98; --good-bg: #153827; --bad: #ff9a92; --bad-bg: #411c1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1c1a; --surface: #152825; --ink: #e6f1ef; --muted: #9bb3af;
+  --line: #28423e; --accent: #4fc3ae; --accent-ink: #06201b;
+  --good: #6ddc98; --good-bg: #153827; --bad: #ff9a92; --bad-bg: #411c1a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); line-height: 1.7; font-size: 17px; min-height: 100vh; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 20px 16px 48px; }
+header { display: flex; flex-direction: column; gap: 4px; padding: 12px 0 18px; }
+.eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; }
+h1 { margin: 0; font-size: 26px; line-height: 1.35; font-weight: 700; text-wrap: balance; }
+.progress { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.bar { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; }
+.topic { display: inline-block; font-size: 13px; font-weight: 600; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 2px 10px; border-radius: 99px; margin-bottom: 12px; }
+.q { margin: 0 0 18px; font-size: 20px; line-height: 1.6; font-weight: 600; text-wrap: balance; }
+.opts { display: flex; flex-direction: column; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.opt { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: right; font: inherit; color: inherit; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:focus-visible, .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.opt .k { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-weight: 700; font-size: 14px; color: var(--muted); }
+.opt:disabled { cursor: default; }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt.right .k { background: var(--good); border-color: var(--good); color: var(--bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.wrong .k { background: var(--bad); border-color: var(--bad); color: var(--bg); }
+.opt.dim { opacity: .6; }
+.feedback { margin-top: 16px; padding: 12px 14px; border-radius: 12px; font-weight: 600; }
+.feedback.ok { background: var(--good-bg); color: var(--good); }
+.feedback.no { background: var(--bad-bg); color: var(--bad); }
+.feedback span { display: block; font-weight: 500; color: var(--ink); margin-top: 2px; }
+.actions { margin-top: 18px; display: flex; justify-content: flex-start; }
+.btn { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 12px 26px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+.result { text-align: center; }
+.score { font-size: 56px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--accent); }
+.score small { font-size: 24px; color: var(--muted); font-weight: 500; }
+.verdict { margin: 6px 0 20px; color: var(--muted); }
+.review { text-align: right; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.review li { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.review li.r-ok { border-inline-start: 5px solid var(--good); }
+.review li.r-no { border-inline-start: 5px solid var(--bad); }
+.review .rq { font-weight: 600; margin-bottom: 4px; }
+.review .ra { font-size: 15px; color: var(--muted); }
+.review .ra b { color: var(--ink); font-weight: 600; }
+.row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">البطاقة 13 من 20 · فني الصحة العامة</span>
+    <h1 id="title"></h1>
+  </header>
+
+  <div id="quiz">
+    <div class="progress">
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="5" id="pbar"><i id="pfill"></i></div>
+      <span class="count" id="count"></span>
+    </div>
+    <section class="card" aria-live="polite">
+      <span class="topic" id="topic"></span>
+      <h2 class="q" id="qtext"></h2>
+      <div class="opts" id="opts" role="group" aria-labelledby="qtext"></div>
+      <div class="feedback" id="fb" hidden></div>
+      <div class="actions"><button class="btn" id="next" hidden></button></div>
+    </section>
+  </div>
+
+  <section class="card result" id="result" hidden>
+    <div class="score"><span id="sc">0</span><small> / 5</small></div>
+    <p class="verdict" id="verdict"></p>
+    <ol class="review" id="review"></ol>
+    <div class="row"><button class="btn" id="again">إعادة الاختبار</button></div>
+  </section>
+</div>
+
+<script>
+const DATA = {"num": 13, "title": "النفايات القابلة لإعادة التدوير", "questions": [{"topic": "التعريف", "text": "ما المقصود بالنفايات القابلة لإعادة التدوير؟", "options": [{"key": "أ", "text": "مواد مستهلكة يمكن معالجتها وتحويلها إلى مواد أو منتجات جديدة."}, {"key": "ب", "text": "مواد لا يمكن الاستفادة منها بأي طريقة."}, {"key": "ج", "text": "مخلفات يجب التخلص منها بالحرق دائمًا."}], "answer": "أ"}, {"topic": "النقاط الأساسية", "text": "أي مجموعة تحتوي على مواد قابلة لإعادة التدوير؟", "options": [{"key": "أ", "text": "بقايا الطعام والمواد الطبية المعدية."}, {"key": "ب", "text": "المواد الكيميائية الخطرة فقط."}, {"key": "ج", "text": "الورق والكرتون والزجاج والمعادن وبعض أنواع البلاستيك."}], "answer": "ج"}, {"topic": "الأهمية", "text": "ما أهمية جمع النفايات القابلة لإعادة التدوير؟", "options": [{"key": "أ", "text": "زيادة استهلاك المواد الخام."}, {"key": "ب", "text": "المحافظة على الموارد الطبيعية وتقليل النفايات."}, {"key": "ج", "text": "زيادة كمية المخلفات في المدافن."}], "answer": "ب"}, {"topic": "الأخطاء الشائعة والوقاية", "text": "أي ممارسة تساعد على تحسين عملية إعادة التدوير؟", "options": [{"key": "أ", "text": "خلط المواد القابلة للتدوير بالنفايات العامة."}, {"key": "ب", "text": "وضع المواد الملوثة مع المواد النظيفة."}, {"key": "ج", "text": "فرز المواد القابلة للتدوير من مصدرها."}], "answer": "ج"}, {"topic": "دور فني الصحة العامة", "text": "ما أحد أدوار فني الصحة العامة في هذا المجال؟", "options": [{"key": "أ", "text": "متابعة ممارسات الفرز ورصد الأخطاء في جمع وتخزين المواد القابلة للتدوير."}, {"key": "ب", "text": "التخلص من جميع المواد القابلة للتدوير."}, {"key": "ج", "text": "خلط المواد المختلفة في حاوية واحدة."}], "answer": "أ"}]};
+const $ = id => document.getElementById(id);
+const qs = DATA.questions;
+let i = 0, answers = [];
+
+$("title").textContent = DATA.title;
+
+function render() {
+  const q = qs[i];
+  $("count").textContent = "السؤال " + (i + 1) + " من " + qs.length;
+  $("pfill").style.width = (i / qs.length * 100) + "%";
+  $("pbar").setAttribute("aria-valuenow", i);
+  $("topic").textContent = q.topic;
+  $("qtext").textContent = q.text;
+  $("fb").hidden = true;
+  $("next").hidden = true;
+  const box = $("opts");
+  box.innerHTML = "";
+  q.options.forEach(o => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.dataset.key = o.key;
+    b.innerHTML = '<span class="k"></span><span class="t"></span>';
+    b.querySelector(".k").textContent = o.key;
+    b.querySelector(".t").textContent = o.text;
+    b.addEventListener("click", () => choose(o.key));
+    box.appendChild(b);
+  });
+}
+
+function choose(key) {
+  const q = qs[i];
+  answers[i] = key;
+  const ok = key === q.answer;
+  document.querySelectorAll(".opt").forEach(b => {
+    b.disabled = true;
+    if (b.dataset.key === q.answer) b.classList.add("right");
+    else if (b.dataset.key === key) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  const right = q.options.find(o => o.key === q.answer);
+  const fb = $("fb");
+  fb.className = "feedback " + (ok ? "ok" : "no");
+  fb.innerHTML = "";
+  fb.append(ok ? "إجابة صحيحة" : "إجابة خاطئة");
+  if (!ok) {
+    const s = document.createElement("span");
+    s.textContent = "الإجابة الصحيحة: " + right.key + ". " + right.text;
+    fb.appendChild(s);
+  }
+  fb.hidden = false;
+  const n = $("next");
+  n.textContent = i === qs.length - 1 ? "عرض النتيجة" : "السؤال التالي";
+  n.hidden = false;
+  n.focus();
+}
+
+function finish() {
+  $("quiz").hidden = true;
+  $("result").hidden = false;
+  let score = 0;
+  const list = $("review");
+  list.innerHTML = "";
+  qs.forEach((q, idx) => {
+    const ok = answers[idx] === q.answer;
+    if (ok) score++;
+    const li = document.createElement("li");
+    li.className = ok ? "r-ok" : "r-no";
+    const right = q.options.find(o => o.key === q.answer);
+    const mine = q.options.find(o => o.key === answers[idx]);
+    const a = document.createElement("div"); a.className = "rq"; a.textContent = (idx + 1) + ". " + q.text;
+    const b = document.createElement("div"); b.className = "ra";
+    b.innerHTML = "<b>الإجابة الصحيحة:</b> ";
+    b.append(right.text);
+    li.append(a, b);
+    if (!ok) {
+      const c = document.createElement("div"); c.className = "ra";
+      c.innerHTML = "<b>إجابتك:</b> ";
+      c.append(mine.text);
+      li.appendChild(c);
+    }
+    list.appendChild(li);
+  });
+  $("sc").textContent = score;
+  $("verdict").textContent = score === 5 ? "ممتاز، أجبت على جميع الأسئلة بشكل صحيح."
+    : score >= 3 ? "نتيجة جيدة، راجع الأسئلة التي أخطأت فيها."
+    : "راجع المحتوى ثم أعد الاختبار.";
+  window.scrollTo(0, 0);
+}
+
+$("next").addEventListener("click", () => {
+  if (i === qs.length - 1) { finish(); return; }
+  i++; render();
+});
+$("again").addEventListener("click", () => {
+  i = 0; answers = [];
+  $("result").hidden = true; $("quiz").hidden = false;
+  render(); window.scrollTo(0, 0);
+});
+render();
+</script>
+</body>
+</html>
